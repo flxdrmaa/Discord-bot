@@ -1,274 +1,276 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Peta Klub GTA: San Andreas</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <title>NFS Carbon Style Map</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Bebas Neue', sans-serif;
-      background: url('https://cdn.discordapp.com/attachments/1344257387699240960/1388926354849923254/reputation_point_1.png?ex=6862c1f8&is=68617078&hm=87cf4dfc487c881764b3ae1c673ef5dc90bdd5b428a4e182f603417a37952853&') no-repeat center center;
-      background-size: cover;
-      color: #e0e7ff;
+      background: #000;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    .map-container {
+      position: relative;
+      min-height: 100vh;
       overflow-x: hidden;
     }
-    #map {
-      height: 100vh;
-      width: 100%;
-      position: relative;
-      background: transparent;
-    }
-    .leaflet-container {
-      background: transparent;
-    }
-    .sidebar {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      width: 280px;
-      max-height: calc(100vh - 20px);
-      background: linear-gradient(135deg, #2d3748, #1a2a44);
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      overflow-y: auto;
-      transition: transform 0.3s ease-in-out;
-      border: 2px solid #3b82f6;
-    }
-    .sidebar-hidden {
-      transform: translateX(-300px);
-    }
-    .sidebar-toggle {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: #3b82f6;
-      padding: 6px;
-      border-radius: 6px;
-      cursor: pointer;
-      z-index: 1001;
-      color: white;
-      font-size: 16px;
-    }
-    .club-list-item {
-      padding: 12px 16px;
-      margin: 4px 0;
-      background: rgba(255, 255, 255, 0.05);
-      border-left: 4px solid transparent;
-      transition: all 0.3s ease;
-      border-radius: 6px;
-    }
-    .club-list-item:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-left-color: #3b82f6;
-      transform: translateX(8px);
-      cursor: pointer;
-    }
-    .leaflet-popup-content-wrapper, .leaflet-popup {
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-    .leaflet-popup-content {
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-    .info-box {
-      width: 300px;
-      background: url('https://i.ibb.co/Q4yRKH5/Screenshot-309.png') no-repeat center center;
+
+    .background-overlay {
+      position: absolute;
+      inset: 0;
+      background: url('https://cdn.discordapp.com/attachments/1344257387699240960/1389260535232594061/reputation_point_2.png?ex=6863f932&is=6862a7b2&hm=23cf5a812129e4e79626bf044867c02bccccd021581441e7435839dbdd01a752&') no-repeat center center;
       background-size: cover;
-      border: 2px solid #00FF00;
-      border-radius: 10px;
-      padding: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 10px #BF00FF;
-      text-align: center;
-      animation: neonGlow 1.5s infinite alternate;
+      opacity: 0.50;
+      z-index: 0;
+      pointer-events: none;
     }
-    .info-box .header {
-      background: linear-gradient(to right, #00FF00, #BF00FF);
-      border-radius: 6px 6px 0 0;
-      padding: 5px;
-      margin: -10px -10px 10px -10px;
-      text-shadow: 0 0 5px #00FF00, 0 0 10px #BF00FF;
-    }
-    .info-box .header span {
-      font-size: 1.2em;
-      color: #ffffff;
-    }
-    .controlled-flex {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin: 16px 0;
-    }
-    .controlled-logo {
-      width: 60px;
-      height: 60px;
-      border-radius: 6px;
-      box-shadow: 0 0 6px #00FF00, 0 0 10px #BF00FF;
-    }
-    .controlled-text {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      line-height: 1.2;
-    }
-    .controlled-label {
-      font-size: 0.85em;
-      color: #ffffff;
-      text-shadow: 0 0 3px #3b82f6;
-    }
-    .controlled-name {
-      font-size: 1.1em;
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 40px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #00ffcc;
+      font-size: 14px;
+      padding: 10px 20px;
       font-weight: bold;
-      color: #00FF00;
-      text-shadow: 0 0 4px #00FF00, 0 0 8px #BF00FF;
-      text-transform: uppercase;
-      animation: flicker 1.5s infinite alternate;
+      letter-spacing: 1px;
+      z-index: 10;
     }
-    .map-image {
-      width: 100%;
-      height: 120px;
-      background: #2d3748;
-      border: 1px solid #00FF00;
-      border-radius: 6px;
-      margin-bottom: 10px;
-      box-shadow: 0 0 10px #BF00FF;
+
+    .map-frame {
+      position: relative;
+      width: 80vw;
+      max-width: 1000px;
+      margin: 60px auto;
+      border: 2px solid rgba(0, 255, 200, 0.3);
+      box-shadow: 0 0 20px rgba(0, 255, 200, 0.1);
+      border-radius: 20px;
+      background: #111;
+      overflow: hidden;
+      z-index: 2;
     }
-    .map-image img {
+
+    .map-frame img {
       width: 100%;
-      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    .zone {
+      position: absolute;
+      cursor: pointer;
+      transition: transform 0.2s;
+      z-index: 5;
+    }
+
+    .zone img {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 0 transparent;
+    }
+
+    .zone:hover img {
+      transform: scale(1.1);
+      box-shadow: 0 0 8px #00ffcc80;
+    }
+
+    #info-box {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      width: 260px;
+      background: #0f1f1d;
+      border: 2px solid #1b3d39;
+      padding: 12px;
+      color: white;
+      display: none;
+      border-radius: 12px;
+      font-family: Arial, sans-serif;
+      z-index: 20;
+      box-shadow: 0 0 15px #00ffcc99;
+    }
+
+    #info-box.active {
+      display: block;
+      animation: slideIn 0.3s ease, neon-border 2.5s infinite alternate;
+    }
+
+    @keyframes neon-border {
+      0% { box-shadow: 0 0 2px #00ff88, 0 0 3px #cc88ff; }
+      50% { box-shadow: 0 0 3px #cc88ff, 0 0 5px #00ff88; }
+      100% { box-shadow: 0 0 2px #00ff88, 0 0 3px #cc88ff; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-60%) translateX(50px); opacity: 0; }
+      to { transform: translateY(-50%) translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+      from { transform: translateY(-50%) translateX(0); opacity: 1; }
+      to { transform: translateY(-60%) translateX(50px); opacity: 0; }
+    }
+
+    #info-box .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #info-box .logo {
+      width: 40px;
+      height: 40px;
+    }
+
+    #info-box .title p {
+      font-size: 12px;
+      margin: 0;
+      color: #bbb;
+    }
+
+    #info-box .title h2 {
+      margin: 0;
+      font-size: 16px;
+      color: #fff200;
+    }
+
+    #info-box .track-map img {
+      width: 100%;
+      margin: 10px 0;
+      border: 1px solid #555;
+      border-radius: 8px;
       object-fit: cover;
-      border-radius: 6px;
+      height: 140px;
+      background: #111;
     }
-    .details {
-      text-align: left;
-      padding-left: 10px;
+
+    #info-box .track-name {
+      font-weight: bold;
+      font-size: 15px;
+      text-align: center;
+      border-top: 1px solid #444;
+      padding-top: 6px;
+      margin-top: 6px;
+      color: #aaffff;
     }
-    .details div {
-      font-size: 0.9em;
-      color: #ffffff;
-      margin-bottom: 5px;
+
+    #info-box .track-details {
+      margin-top: 5px;
+    }
+
+    #info-box .track-details div {
       display: flex;
       justify-content: space-between;
+      font-size: 13px;
+      padding: 2px 0;
     }
-    .details div span:last-child {
-      color: #00FF00;
-      text-shadow: 0 0 4px #00FF00, 0 0 6px #BF00FF;
-      animation: flicker 1.6s infinite alternate;
-    }
-    @keyframes neonGlow {
-      from { box-shadow: 0 0 5px #00FF00, 0 0 10px #BF00FF; }
-      to { box-shadow: 0 0 10px #00FF00, 0 0 20px #BF00FF; }
-    }
-    @keyframes flicker {
-      0% { text-shadow: 0 0 2px #00FF00, 0 0 6px #BF00FF; }
-      50% { text-shadow: 0 0 6px #BF00FF, 0 0 10px #00FF00; }
-      100% { text-shadow: 0 0 4px #00FF00, 0 0 8px #BF00FF; }
+
+    #info-box .track-details span {
+      color: #ccc;
     }
   </style>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    function createMarker(club) {
-      const iconSize = club.iconSize || [50, 50];
-      const icon = L.icon({
-        iconUrl: club.logo,
-        iconSize: iconSize,
-        iconAnchor: [iconSize[0]/2, iconSize[1]],
-        popupAnchor: [0, -iconSize[1]]
-      });
-      return L.marker(club.coords, { icon });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const map = L.map('map', {
-        crs: L.CRS.Simple,
-        minZoom: -4,
-        maxZoom: 6,
-        zoomControl: false
-      });
-
-      const bounds = [[0, 0], [6000, 6000]];
-      const mapImage = 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/942d6817-886f-440a-a790-43043fcb13ae/db1p8cc-f8729260-60cf-4248-829a-8b705c485256.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzk0MmQ2ODE3LTg4NmYtNDQwYS1hNzkwLTQzMDQzZmNiMTNhZVwvZGIxcDhjYy1mODcyOTI2MC02MGNmLTQyNDgtODI5YS04YjcwNWM0ODUyNTYuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.JEByT3IGtfE4rM1ZlpWoedIUDrhVX0UU5x34cYUWqcc';
-      L.imageOverlay(mapImage, bounds).addTo(map);
-      map.fitBounds(bounds);
-
-      const clubs = [
-        {
-          name: "Easter Bay",
-          logo: "https://cdn.discordapp.com/attachments/1359719292332933122/1359719292538589247/20250123_175714-removebg-preview.png?ex=6861f8c5&is=6860a745&hm=f1c9ce5fb5391dbb734497182594698e42421af608d2ba16bfcd9f6bdc4b687d&",
-          info: {
-            penguasa: "IMR",
-            taruhan: "$5000",
-            route: "https://cdn.discordapp.com/attachments/1335427555221700630/1347561448078966784/TRACK4.png?ex=686290e5&is=68613f65&hm=5436dd5f382e5265f10178e0e0de0b846df3b9e7f56d3713ff3beb3a41505c25&"
-          },
-          coords: [2881, 1200],
-          color: 'green',
-          iconSize: [120, 120]
-        }
-      ];
-
-      clubs.forEach(club => {
-        const marker = createMarker(club).addTo(map);
-
-        marker.bindPopup(`
-          <div class="info-box">
-            <div class="header">
-              <span>${club.name}</span>
-            </div>
-            <div class="controlled-flex">
-              <img src="${club.logo}" class="controlled-logo" />
-              <div class="controlled-text">
-                <div class="controlled-label">Controlled By</div>
-                <div class="controlled-name">${club.info.penguasa}</div>
-              </div>
-            </div>
-            <div class="map-image">
-              <img src="${club.info.route}" alt="Route Map" />
-            </div>
-            <div class="details">
-              <div><span>Length</span><span>${club.info.taruhan}</span></div>
-              <div><span>Laps</span><span>3</span></div>
-              <div><span>Record</span><span>1:32.41</span></div>
-              <div><span>Cash</span><span>$8000</span></div>
-            </div>
-          </div>
-        `);
-
-        const listItem = document.createElement('li');
-        listItem.className = `club-list-item border-l-4 border-${club.color}-500 bg-gray-800`;
-        listItem.innerHTML = `<span class="text-white text-lg">${club.name}</span>`;
-        listItem.onclick = () => {
-          map.setView(club.coords, 2);
-          marker.openPopup();
-        };
-        document.getElementById('club-list').appendChild(listItem);
-      });
-
-      document.getElementById('sidebar-toggle').onclick = () => {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('sidebar-hidden');
-        document.getElementById('sidebar-toggle').textContent = sidebar.classList.contains('sidebar-hidden') ? '☰' : '✖';
-      };
-    });
-  </script>
 </head>
 <body>
-  <div id="map"></div>
-  <div id="sidebar" class="sidebar">
-    <div class="header p-4">
-      <h2 class="text-2xl font-bold text-white">Route Name List</h2>
+
+  <div class="map-container">
+    <div class="background-overlay"></div>
+    <div class="topbar">
+      <h2>Welcome to Street.NET</h2>
     </div>
-    <div class="p-4 space-y-2">
-      <ul id="club-list" class="space-y-2"></ul>
+
+    <!-- Main Map Frame -->
+    <div class="map-frame">
+      <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/942d6817-886f-440a-a790-43043fcb13ae/db1p8cc-f8729260-60cf-4248-829a-8b705c485256.jpg/v1/fill/w_894,h_894,q_70,strp/gta_san_andreas___satellite_map_by_wguayana_db1p8cc-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NjAwMCIsInBhdGgiOiJcL2ZcLzk0MmQ2ODE3LTg4NmYtNDQwYS1hNzkwLTQzMDQzZmNiMTNhZVwvZGIxcDhjYy1mODcyOTI2MC02MGNmLTQyNDgtODI5YS04YjcwNWM0ODUyNTYuanBnIiwid2lkdGgiOiI8PTYwMDAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.f_GsPwrFtPMyCEhFl2vYgBsGvcJp5uhnx2iIVO4V5Vg" alt="Main Map" />
+
+      <!-- Zones (12 total) -->
+      <div class="zone" onclick="showInfo(1)" style="top: 20%; left: 10%;"><img src="https://i.imgur.com/3nb7ZKR.png"></div>
+      <div class="zone" onclick="showInfo(2)" style="top: 25%; left: 30%;"><img src="https://i.imgur.com/VqI0Vu2.png"></div>
+      <div class="zone" onclick="showInfo(3)" style="top: 30%; left: 50%;"><img src="https://i.imgur.com/sWy5kNF.png"></div>
+      <div class="zone" onclick="showInfo(4)" style="top: 35%; left: 70%;"><img src="https://i.imgur.com/x3GRHmp.png"></div>
+      <div class="zone" onclick="showInfo(5)" style="top: 40%; left: 85%;"><img src="https://i.imgur.com/Hv2brpq.png"></div>
+      <div class="zone" onclick="showInfo(6)" style="top: 50%; left: 15%;"><img src="https://i.imgur.com/3nb7ZKR.png"></div>
+      <div class="zone" onclick="showInfo(7)" style="top: 55%; left: 35%;"><img src="https://i.imgur.com/VqI0Vu2.png"></div>
+      <div class="zone" onclick="showInfo(8)" style="top: 60%; left: 55%;"><img src="https://i.imgur.com/sWy5kNF.png"></div>
+      <div class="zone" onclick="showInfo(9)" style="top: 65%; left: 75%;"><img src="https://i.imgur.com/x3GRHmp.png"></div>
+      <div class="zone" onclick="showInfo(10)" style="top: 70%; left: 90%;"><img src="https://i.imgur.com/Hv2brpq.png"></div>
+      <div class="zone" onclick="showInfo(11)" style="top: 75%; left: 40%;"><img src="https://i.imgur.com/3nb7ZKR.png"></div>
+      <div class="zone" onclick="showInfo(12)" style="top: 80%; left: 60%;"><img src="https://i.imgur.com/VqI0Vu2.png"></div>
+    </div>
+
+    <!-- Info Box -->
+    <div id="info-box">
+      <div class="header">
+        <img id="info-logo" class="logo" src="" alt="Club Logo" />
+        <div class="title">
+          <p>Controlled By</p>
+          <h2 id="info-club">CLUB</h2>
+        </div>
+      </div>
+      <div class="track-map">
+        <img id="info-track-map" src="" alt="Track Map" />
+      </div>
+      <div class="track-name" id="info-track-name">Track Name</div>
+      <div class="track-details">
+        <div><span>Length</span><strong id="info-length">-</strong></div>
+        <div><span>Laps</span><strong id="info-laps">-</strong></div>
+        <div><span>Record</span><strong id="info-record">-</strong></div>
+        <div><span>Cash</span><strong id="info-cash">-</strong></div>
+      </div>
     </div>
   </div>
-  <div id="sidebar-toggle" class="sidebar-toggle">✖</div>
+
+  <script>
+    const zoneData = {
+      1: { club: "Bushido", logo: "https://i.imgur.com/3nb7ZKR.png", track: "https://i.imgur.com/EDMsyjR.png", name: "Kimei Temple", length: "2.7 MILES", laps: "2", record: "220,000", cash: "5,000" },
+      2: { club: "TFK", logo: "https://i.imgur.com/VqI0Vu2.png", track: "https://i.imgur.com/EDMsyjR.png", name: "City Edge", length: "3.1 MILES", laps: "3", record: "185,000", cash: "6,000" },
+      3: { club: "Scorpios", logo: "https://i.imgur.com/sWy5kNF.png", track: "https://i.imgur.com/EDMsyjR.png", name: "Canyon Pass", length: "4.0 MILES", laps: "1", record: "210,000", cash: "7,000" },
+      4: { club: "Wolfpack", logo: "https://i.imgur.com/x3GRHmp.png", track: "https://i.imgur.com/EDMsyjR.png", name: "Midtown Rush", length: "3.5 MILES", laps: "3", record: "190,000", cash: "6,500" },
+      5: { club: "Kings", logo: "https://i.imgur.com/Hv2brpq.png", track: "https://i.imgur.com/EDMsyjR.png", name: "Downtown Loop", length: "2.9 MILES", laps: "2", record: "200,000", cash: "5,500" },
+      6: { club: "Bushido", logo: "https://i.imgur.com/3nb7ZKR.png", track: "https://i.imgur.com/EDMsyjR.png", name: "Night Harbor", length: "3.3 MILES", laps: "2", record: "195,000", cash: "5,800" },
+      7: { club: "TFK", logo: "https://i.imgur.com/VqI0Vu2.png", track: "https://i.imgur.com/EDMsyjR.png", name: "Street Clash", length: "3.8 MILES", laps: "3", record: "210,000", cash: "6,200" },
+      8: { club: "Scorpios", logo: "https://i.imgur.com/sWy5kNF.png", track: "https://i.imgur.com/EDMsyjR.png", name: "Hill Drift", length: "2.5 MILES", laps: "2", record: "170,000", cash: "4,800" },
+      9: { club: "Wolfpack", logo: "https://i.imgur.com/x3GRHmp.png", track: "https://i.imgur.com/EDMsyjR.png", name: "Sunset Speed", length: "3.6 MILES", laps: "3", record: "200,000", cash: "6,700" },
+      10: { club: "Kings", logo: "https://i.imgur.com/Hv2brpq.png", track: "https://i.imgur.com/EDMsyjR.png", name: "Bridge Fight", length: "3.0 MILES", laps: "2", record: "180,000", cash: "6,000" },
+      11: { club: "Scorpios", logo: "https://i.imgur.com/sWy5kNF.png", track: "https://i.imgur.com/EDMsyjR.png", name: "River Drift", length: "3.2 MILES", laps: "2", record: "195,000", cash: "5,900" },
+      12: { club: "Bushido", logo: "https://i.imgur.com/3nb7ZKR.png", track: "https://i.imgur.com/EDMsyjR.png", name: "Docks Clash", length: "2.6 MILES", laps: "2", record: "175,000", cash: "5,200" }
+    };
+
+    function showInfo(id) {
+      const info = zoneData[id];
+      if (!info) return;
+      document.getElementById('info-logo').src = info.logo;
+      document.getElementById('info-club').textContent = info.club;
+      document.getElementById('info-track-map').src = info.track;
+      document.getElementById('info-track-name').textContent = info.name;
+      document.getElementById('info-length').textContent = info.length;
+      document.getElementById('info-laps').textContent = info.laps;
+      document.getElementById('info-record').textContent = info.record;
+      document.getElementById('info-cash').textContent = info.cash;
+      document.getElementById('info-box').classList.add('active');
+    }
+
+    document.addEventListener('click', function (e) {
+      const box = document.getElementById('info-box');
+      if (!box.contains(e.target) && !e.target.closest('.zone')) {
+        closeInfo();
+      }
+    });
+
+    function closeInfo() {
+      const box = document.getElementById('info-box');
+      box.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => {
+        box.classList.remove('active');
+        box.style.animation = '';
+      }, 300);
+    }
+  </script>
 </body>
 </html>
