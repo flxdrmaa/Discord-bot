@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NFS Carbon Style Map</title>
   <style>
     body {
@@ -9,16 +10,18 @@
       background: #000;
       font-family: Arial, sans-serif;
       color: white;
+      overflow-x: hidden;
     }
 
     .map-container {
       position: relative;
       min-height: 100vh;
+      width: 100%;
       overflow-x: hidden;
     }
 
     .background-overlay {
-      position: absolute;
+      position: fixed;
       inset: 0;
       background: url('https://cdn.discordapp.com/attachments/1344257387699240960/1389260535232594061/reputation_point_2.png?ex=6863f932&is=6862a7b2&hm=23cf5a812129e4e79626bf044867c02bccccd021581441e7435839dbdd01a752&') no-repeat center center;
       background-size: cover;
@@ -31,31 +34,34 @@
       position: sticky;
       top: 0;
       width: 100%;
-      height: 40px;
+      height: clamp(40px, 10vw, 50px);
       background: rgba(0, 0, 0, 0.6);
       color: #00ffcc;
-      font-size: 14px;
-      padding: 10px 20px;
+      font-size: clamp(12px, 3vw, 16px);
+      padding: clamp(8px, 2vw, 12px) clamp(10px, 3vw, 20px);
       font-weight: bold;
       letter-spacing: 1px;
       z-index: 10;
+      display: flex;
+      align-items: center;
     }
 
     .map-frame {
       position: relative;
-      width: 80vw;
-      max-width: 1000px;
-      margin: 60px auto;
+      width: min(90vw, 1200px);
+      margin: clamp(20px, 5vw, 60px) auto;
       border: 2px solid rgba(0, 255, 200, 0.3);
       box-shadow: 0 0 20px rgba(0, 255, 200, 0.1);
       border-radius: 20px;
       background: #111;
       overflow: hidden;
       z-index: 2;
+      aspect-ratio: 1 / 1;
     }
 
     .map-frame img {
       width: 100%;
+      height: 100%;
       display: block;
       object-fit: contain;
     }
@@ -65,11 +71,13 @@
       cursor: pointer;
       transition: transform 0.2s;
       z-index: 5;
+      width: clamp(30px, 5vw, 40px);
+      height: clamp(30px, 5vw, 40px);
     }
 
     .zone img {
-      width: 40px;
-      height: 40px;
+      width: 100%;
+      height: 100%;
       border-radius: 10px;
       transition: all 0.3s ease;
       box-shadow: 0 0 0 transparent;
@@ -83,12 +91,12 @@
     #info-box {
       position: fixed;
       top: 50%;
-      right: 20px;
+      right: clamp(10px, 3vw, 20px);
       transform: translateY(-50%);
-      width: 260px;
+      width: min(80vw, 300px);
       background: #0f1f1d;
       border: 2px solid #1b3d39;
-      padding: 12px;
+      padding: clamp(8px, 2vw, 12px);
       color: white;
       display: none;
       border-radius: 12px;
@@ -121,64 +129,130 @@
     #info-box .header {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: clamp(8px, 2vw, 10px);
     }
 
     #info-box .logo {
-      width: 40px;
-      height: 40px;
+      width: clamp(30px, 10vw, 40px);
+      height: clamp(30px, 10vw, 40px);
     }
 
     #info-box .title p {
-      font-size: 12px;
+      font-size: clamp(10px, 2.5vw, 12px);
       margin: 0;
       color: #bbb;
     }
 
     #info-box .title h2 {
       margin: 0;
-      font-size: 16px;
+      font-size: clamp(14px, 3.5vw, 16px);
       color: #fff200;
     }
 
     #info-box .track-map img {
       width: 100%;
-      margin: 10px 0;
+      margin: clamp(8px, 2vw, 10px) 0;
       border: 1px solid #555;
       border-radius: 8px;
       object-fit: cover;
-      height: 140px;
+      height: clamp(100px, 30vw, 140px);
       background: #111;
     }
 
     #info-box .track-name {
       font-weight: bold;
-      font-size: 15px;
+      font-size: clamp(12px, 3vw, 15px);
       text-align: center;
       border-top: 1px solid #444;
-      padding-top: 6px;
-      margin-top: 6px;
+      padding-top: clamp(4px, 1.5vw, 6px);
+      margin-top: clamp(4px, 1.5vw, 6px);
       color: #aaffff;
     }
 
     #info-box .track-details {
-      margin-top: 5px;
+      margin-top: clamp(4px, 1.5vw, 5px);
     }
 
     #info-box .track-details div {
       display: flex;
       justify-content: space-between;
-      font-size: 13px;
-      padding: 2px 0;
+      font-size: clamp(11px, 2.5vw, 13px);
+      padding: clamp(2px, 0.5vw, 3px) 0;
     }
 
     #info-box .track-details span {
       color: #ccc;
     }
+
+    /* Media Queries for Smaller Devices */
+    @media screen and (max-width: 768px) {
+      .map-frame {
+        width: 95vw;
+        margin: clamp(10px, 3vw, 20px) auto;
+      }
+
+      .zone {
+        width: clamp(25px, 6vw, 30px);
+        height: clamp(25px, 6vw, 30px);
+      }
+
+      #info-box {
+        width: min(90vw, 250px);
+        right: clamp(5px, 2vw, 10px);
+        padding: clamp(6px, 1.5vw, 10px);
+      }
+
+      #info-box .logo {
+        width: clamp(25px, 8vw, 30px);
+        height: clamp(25px, 8vw, 30px);
+      }
+
+      #info-box .track-map img {
+        height: clamp(80px, 25vw, 100px);
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .topbar {
+        font-size: clamp(10px, 2.5vw, 12px);
+        padding: clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 10px);
+      }
+
+      .map-frame {
+        width: 98vw;
+        border-radius: 10px;
+      }
+
+      .zone {
+        width: clamp(20px, 5vw, 25px);
+        height: clamp(20px, 5vw, 25px);
+      }
+
+      #info-box {
+        width: 90vw;
+        top: auto;
+        bottom: 10px;
+        right: 50%;
+        transform: translateX(50%);
+      }
+
+      #info-box.active {
+        animation: slideInMobile 0.3s ease, neon-border 2.5s infinite alternate;
+      }
+
+      @keyframes slideInMobile {
+        from { transform: translateX(50%) translateY(50px); opacity: 0; }
+        to { transform: translateX(50%) translateY(0); opacity: 1; }
+      }
+
+      @keyframes slideOut {
+        from { transform: translateX(50%) translateY(0); opacity: 1; }
+        to { transform: translateX(50%) translateY(50px); opacity: 0; }
+      }
+    }
   </style>
 </head>
 <body>
-
   <div class="map-container">
     <div class="background-overlay"></div>
     <div class="topbar">
@@ -190,18 +264,18 @@
       <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/942d6817-886f-440a-a790-43043fcb13ae/db1p8cc-f8729260-60cf-4248-829a-8b705c485256.jpg/v1/fill/w_894,h_894,q_70,strp/gta_san_andreas___satellite_map_by_wguayana_db1p8cc-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NjAwMCIsInBhdGgiOiJcL2ZcLzk0MmQ2ODE3LTg4NmYtNDQwYS1hNzkwLTQzMDQzZmNiMTNhZVwvZGIxcDhjYy1mODcyOTI2MC02MGNmLTQyNDgtODI5YS04YjcwNWM0ODUyNTYuanBnIiwid2lkdGgiOiI8PTYwMDAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.f_GsPwrFtPMyCEhFl2vYgBsGvcJp5uhnx2iIVO4V5Vg" alt="Main Map" />
 
       <!-- Zones (12 total) -->
-      <div class="zone" onclick="showInfo(1)" style="top: 20%; left: 10%;"><img src="https://i.imgur.com/3nb7ZKR.png"></div>
-      <div class="zone" onclick="showInfo(2)" style="top: 25%; left: 30%;"><img src="https://i.imgur.com/VqI0Vu2.png"></div>
-      <div class="zone" onclick="showInfo(3)" style="top: 30%; left: 50%;"><img src="https://i.imgur.com/sWy5kNF.png"></div>
-      <div class="zone" onclick="showInfo(4)" style="top: 35%; left: 70%;"><img src="https://i.imgur.com/x3GRHmp.png"></div>
-      <div class="zone" onclick="showInfo(5)" style="top: 40%; left: 85%;"><img src="https://i.imgur.com/Hv2brpq.png"></div>
-      <div class="zone" onclick="showInfo(6)" style="top: 50%; left: 15%;"><img src="https://i.imgur.com/3nb7ZKR.png"></div>
-      <div class="zone" onclick="showInfo(7)" style="top: 55%; left: 35%;"><img src="https://i.imgur.com/VqI0Vu2.png"></div>
-      <div class="zone" onclick="showInfo(8)" style="top: 60%; left: 55%;"><img src="https://i.imgur.com/sWy5kNF.png"></div>
-      <div class="zone" onclick="showInfo(9)" style="top: 65%; left: 75%;"><img src="https://i.imgur.com/x3GRHmp.png"></div>
-      <div class="zone" onclick="showInfo(10)" style="top: 70%; left: 90%;"><img src="https://i.imgur.com/Hv2brpq.png"></div>
-      <div class="zone" onclick="showInfo(11)" style="top: 75%; left: 40%;"><img src="https://i.imgur.com/3nb7ZKR.png"></div>
-      <div class="zone" onclick="showInfo(12)" style="top: 80%; left: 60%;"><img src="https://i.imgur.com/VqI0Vu2.png"></div>
+      <div class="zone" onclick="showInfo(1)" style="top: 20%; left: 10%;"><img src="https://i.imgur.com/3nb7ZKR.png" alt="Zone 1"></div>
+      <div class="zone" onclick="showInfo(2)" style="top: 25%; left: 30%;"><img src="https://i.imgur.com/VqI0Vu2.png" alt="Zone 2"></div>
+      <div class="zone" onclick="showInfo(3)" style="top: 30%; left: 50%;"><img src="https://i.imgur.com/sWy5kNF.png" alt="Zone 3"></div>
+      <div class="zone" onclick="showInfo(4)" style="top: 35%; left: 70%;"><img src="https://i.imgur.com/x3GRHmp.png" alt="Zone 4"></div>
+      <div class="zone" onclick="showInfo(5)" style="top: 40%; left: 85%;"><img src="https://i.imgur.com/Hv2brpq.png" alt="Zone 5"></div>
+      <div class="zone" onclick="showInfo(6)" style="top: 50%; left: 15%;"><img src="https://i.imgur.com/3nb7ZKR.png" alt="Zone 6"></div>
+      <div class="zone" onclick="showInfo(7)" style="top: 55%; left: 35%;"><img src="https://i.imgur.com/VqI0Vu2.png" alt="Zone 7"></div>
+      <div class="zone" onclick="showInfo(8)" style="top: 60%; left: 55%;"><img src="https://i.imgur.com/sWy5kNF.png" alt="Zone 8"></div>
+      <div class="zone" onclick="showInfo(9)" style="top: 65%; left: 75%;"><img src="https://i.imgur.com/x3GRHmp.png" alt="Zone 9"></div>
+      <div class="zone" onclick="showInfo(10)" style="top: 70%; left: 90%;"><img src="https://i.imgur.com/Hv2brpq.png" alt="Zone 10"></div>
+      <div class="zone" onclick="showInfo(11)" style="top: 75%; left: 40%;"><img src="https://i.imgur.com/3nb7ZKR.png" alt="Zone 11"></div>
+      <div class="zone" onclick="showInfo(12)" style="top: 80%; left: 60%;"><img src="https://i.imgur.com/VqI0Vu2.png" alt="Zone 12"></div>
     </div>
 
     <!-- Info Box -->
